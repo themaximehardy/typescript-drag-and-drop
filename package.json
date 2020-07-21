@@ -1,0 +1,12 @@
+{
+  "name": "typescript-drag-and-drop",
+  "version": "1.0.0",
+  "description": "Using TypeScript to build a drag and drop",
+  "main": "index.js",
+  "repository": "git@github.com:themaximehardy/typescript-drag-and-drop.git",
+  "author": "Max Hardy <max@hardy.work>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  }
+}

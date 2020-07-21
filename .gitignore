@@ -1,0 +1,8 @@
+# MacOS
+.DS_Store
+
+# Dependency directories
+node_modules/
+
+# dist folder (.js)
+dist/*.js
