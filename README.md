@@ -233,9 +233,6 @@ class ProjectInput {
 We have implemented a new class `ProjectList`. It is very similar to the `ProjectInput` class. The main differences are the element we select on the HTML (e.g. `#project-list`).
 
 ```ts
-/**
- * ProjectList class
- */
 class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
@@ -267,4 +264,74 @@ class ProjectList {
 const prjInput = new ProjectInput();
 const activePrjList = new ProjectList('active'); // we call the active list here
 const finishedPrjList = new ProjectList('finished'); // we call the finished list here
+```
+
+### 7. Managing Application State with Singleton
+
+We have create a class - `ProjectState` - to manage our state. We have an `array` of `projects` (which is an object with an `id`, a `title`, a `description` and a number of `people`). We also have an array of `listeners` which is an array of `function`, it will help us to share the change of the state "reactively" with our others classes. We decided to create a singleton via a **private constructor**, a **private static** `instance` field and a **static method** `getInstance`. If the instance already exists, we return it, otherwise we call the private constructor to instantiate it.
+
+```ts
+class ProjectState {
+  private listeners: any[] = []; // we'll change any later
+  private projects: any[] = []; // we'll change any later
+  private static instance: ProjectState;
+
+  private constructor() {}
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  addListener(listenerFn: Function) {
+    this.listeners.push(listenerFn);
+  }
+
+  addProject(title: string, description: string, numOfPeople: number) {
+    const newProject = {
+      id: Math.random.toString(), // Not a good practice but ok for our purpose here
+      title,
+      description,
+      people: numOfPeople,
+    };
+    this.projects.push(newProject);
+    for (const listenerFn of this.listeners) {
+      // slice allow us to return a copy of the array and not the reference
+      listenerFn(this.projects.slice());
+    }
+  }
+}
+```
+
+We called the method `addListener` on the `projectState` instance. We passed a function, the projects are returned and I can assign them to the `assignedProjects` (a field which is a array of all the current projects created). We render them via `renderProjects`.
+
+```ts
+//...
+class ProjectList {
+  //...
+  assignedProjects: any[]; // we'll change any later
+  //...
+  constructor(private type: 'active' | 'finished') {
+    //...
+    projectState.addListener((projects: any[]) => {
+      this.assignedProjects = projects;
+      this.renderProjects();
+    });
+    this.attach();
+    this.renderContent();
+  }
+
+  private renderProjects() {
+    const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+    for (const prjItem of this.assignedProjects) {
+      const listItem = document.createElement('li');
+      listItem.textContent = prjItem.title;
+      listEl.appendChild(listItem);
+    }
+  }
+}
+//...
 ```
