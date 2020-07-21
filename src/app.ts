@@ -1,3 +1,38 @@
+// VALIDATION
+interface Validatable {
+  value: string | number;
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+}
+
+function validate(validatableInput: Validatable) {
+  let isValid = true;
+  if (validatableInput.required) {
+    isValid = isValid && validatableInput.value.toString().trim().length !== 0;
+  }
+
+  if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
+    isValid = isValid && validatableInput.value.trim().length >= validatableInput.minLength;
+  }
+
+  if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
+    isValid = isValid && validatableInput.value.trim().length <= validatableInput.maxLength;
+  }
+
+  if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+    isValid = isValid && validatableInput.value >= validatableInput.min;
+  }
+
+  if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+    isValid = isValid && validatableInput.value <= validatableInput.max;
+  }
+
+  return isValid;
+}
+
 /**
  * Autobind decorator (method decorator)
  * @param _ (target, not used here)
@@ -50,11 +85,25 @@ class ProjectInput {
     const enteredDescription = this.descriptionInputElement.value;
     const enteredPeople = this.peopleInputElement.value;
 
-    if (
-      enteredTitle.trim().length === 0 ||
-      enteredDescription.trim().length === 0 ||
-      enteredPeople.trim().length === 0
-    ) {
+    const titleValidatable: Validatable = {
+      value: enteredTitle,
+      required: true,
+    };
+
+    const descriptionValidatable: Validatable = {
+      value: enteredDescription,
+      required: true,
+      minLength: 5,
+    };
+
+    const peopleValidatable: Validatable = {
+      value: +enteredPeople,
+      required: true,
+      min: 1,
+      max: 5,
+    };
+
+    if (!validate(titleValidatable) || !validate(descriptionValidatable) || !validate(peopleValidatable)) {
       alert('Invalid input, please try again!');
       return;
     }
