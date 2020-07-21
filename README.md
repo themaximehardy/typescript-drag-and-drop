@@ -376,3 +376,30 @@ class ProjectState {
   }
   //...
 ```
+
+### 9. Filtering Projects with Enums
+
+The idea here is to filter on the projects returned by the listener – `Active` or `Finished`.
+
+```ts
+//...
+class ProjectList {
+  //...
+  assignedProjects: Project[];
+
+  constructor(private type: 'active' | 'finished') {
+    //...
+    projectState.addListener((projects: Project[]) => {
+      const relevantProjects = projects.filter((prj) => {
+        if (this.type === 'active') {
+          return prj.status === ProjectStatus.Active;
+        }
+        return prj.status === ProjectStatus.Finished;
+      });
+      this.assignedProjects = relevantProjects;
+      this.renderProjects();
+    });
+    //...
+  }
+  //...
+```
