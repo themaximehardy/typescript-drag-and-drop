@@ -335,3 +335,44 @@ class ProjectList {
 }
 //...
 ```
+
+### 8. More Classes & Custom Types
+
+We have created a `Project` class to enforce the same project structure everywhere we want to use it. We added a `status` which is an `enum` (`ProjectStatus`). We've also created a new type `Listener`, which is a function which takes `Project` array in arg and return void. We now create a new project by `const newProject = new Project(Math.random.toString(), title, description, numOfPeople, ProjectStatus.Active);`.
+
+```ts
+// PROJECT TYPE
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
+class Project {
+  constructor(
+    public id: string,
+    public title: string,
+    public description: string,
+    public people: number,
+    public status: ProjectStatus,
+  ) {}
+}
+
+// PROJECT STATE MANAGEMENT
+type Listener = (items: Project[]) => void; // Listener type added
+
+class ProjectState {
+  private listeners: Listener[] = []; // we replaced any
+  private projects: Project[] = []; // we replaced any
+  private static instance: ProjectState;
+
+  //...
+  addProject(title: string, description: string, numOfPeople: number) {
+    const newProject = new Project(Math.random.toString(), title, description, numOfPeople, ProjectStatus.Active);
+    this.projects.push(newProject);
+    for (const listenerFn of this.listeners) {
+      // slice allow us to return a copy of the array and not the reference
+      listenerFn(this.projects.slice());
+    }
+  }
+  //...
+```
