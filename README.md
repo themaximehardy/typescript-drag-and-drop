@@ -75,3 +75,34 @@ class ProjectInput {
 
 const prjInput = new ProjectInput();
 ```
+
+### 3. Creating and Using an "Autobind" Decorator
+
+We created a **decorator**, more precisely, a **method decorator**. Now we can automatically `bind` the `this`.
+
+```ts
+/**
+ * Autobind decorator (method decorator)
+ * @param _ (target, not used here)
+ * @param _2 (methodName, not used here)
+ * @param descriptor
+ */
+function Autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  const adjustedDescriptor: PropertyDescriptor = {
+    configurable: true,
+    get() {
+      const boundFn = originalMethod.bind(this);
+      return boundFn;
+    },
+  };
+  return adjustedDescriptor;
+}
+```
+
+We used it, as showed below:
+
+```ts
+@Autobind
+  private submitHandler(event: Event) { ... }
+```
