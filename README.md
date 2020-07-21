@@ -106,3 +106,45 @@ We used it, as showed below:
 @Autobind
   private submitHandler(event: Event) { ... }
 ```
+
+### 4. Fetching User Input
+
+Here, we have created a new private function `gatherUserInput` which return a tuple (or void). We have created a simple data validation but very naive and not scalable (we're going to improve it later). In `submitHandler`, we're returning the tuple in a constant `userInput` but need to verify if it is a tuple. Because JS doesn't know what is a tuple we need to check if it is an `array` via `Array.isArray(value)`. We also wanted to clear the inputs after submission, we created `clearInputs`.
+
+```ts
+//...
+  private gatherUserInput(): [string, string, number] | void {
+    const enteredTitle = this.titleInputElement.value;
+    const enteredDescription = this.descriptionInputElement.value;
+    const enteredPeople = this.peopleInputElement.value;
+
+    if (
+      enteredTitle.trim().length === 0 ||
+      enteredDescription.trim().length === 0 ||
+      enteredPeople.trim().length === 0
+    ) {
+      alert('Invalid input, please try again!');
+      return;
+    }
+
+    return [enteredTitle, enteredDescription, +enteredPeople];
+  }
+
+  private clearInputs() {
+    this.titleInputElement.value = '';
+    this.descriptionInputElement.value = '';
+    this.peopleInputElement.value = '';
+  }
+
+  @Autobind
+  private submitHandler(event: Event) {
+    event.preventDefault();
+    const userInput = this.gatherUserInput();
+    if (Array.isArray(userInput)) {
+      const [title, desc, people] = userInput;
+      console.log(title, desc, people);
+      this.clearInputs();
+    }
+  }
+//...
+```
