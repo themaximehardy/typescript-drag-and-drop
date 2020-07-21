@@ -227,3 +227,44 @@ class ProjectInput {
   //...
 }
 ```
+
+### 6. Rendering Project Lists
+
+We have implemented a new class `ProjectList`. It is very similar to the `ProjectInput` class. The main differences are the element we select on the HTML (e.g. `#project-list`).
+
+```ts
+/**
+ * ProjectList class
+ */
+class ProjectList {
+  templateElement: HTMLTemplateElement;
+  hostElement: HTMLDivElement;
+  element: HTMLElement;
+
+  constructor(private type: 'active' | 'finished') {
+    this.templateElement = document.getElementById('project-list')! as HTMLTemplateElement;
+    this.hostElement = document.getElementById('app')! as HTMLDivElement;
+
+    const importedNode = document.importNode(this.templateElement.content, true);
+    this.element = importedNode.firstElementChild as HTMLElement;
+    this.element.id = `${this.type}-projects`;
+    this.attach();
+    this.renderContent();
+  }
+
+  private renderContent() {
+    const listId = `${this.type}-projects-list`;
+    this.element.querySelector('ul')!.id = listId; // we add an id to the `ul` element (based on the list type, active or finished)
+    this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS'; // we fill the h2 title (based on the list type, active or finished)
+  }
+
+  private attach() {
+    this.hostElement.insertAdjacentElement('beforeend', this.element); // we want to add the element before to close the tag
+  }
+}
+
+//...
+const prjInput = new ProjectInput();
+const activePrjList = new ProjectList('active'); // we call the active list here
+const finishedPrjList = new ProjectList('finished'); // we call the finished list here
+```
