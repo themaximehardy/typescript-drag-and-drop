@@ -496,3 +496,45 @@ class ProjectState extends State<Project> {
   }
 }
 ```
+
+### 11. Rendering Project Items with a Class
+
+We've created a `ProjectItem` class which extends `Component`.
+
+```ts
+//...
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private project: Project;
+
+  constructor(hostId: string, project: Project) {
+    super('single-project', hostId, false, project.id);
+    this.project = project;
+    this.configure();
+    this.renderContent();
+  }
+
+  configure() {}
+  renderContent() {
+    this.element.querySelector('h2')!.textContent = this.project.title;
+    this.element.querySelector('h3')!.textContent = this.project.people.toString();
+    this.element.querySelector('p')!.textContent = this.project.description;
+  }
+}
+
+class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+  //...
+
+  renderContent() {
+    const listId = `${this.type}-projects-list`;
+    this.element.querySelector('ul')!.id = listId;
+    this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
+  }
+
+  private renderProjects() {
+    for (const prjItem of this.assignedProjects) {
+      new ProjectItem(this.element.querySelector('ul')!.id, prjItem); // we created a new instance of ProjectItem for every project
+    }
+  }
+}
+//...
+```
