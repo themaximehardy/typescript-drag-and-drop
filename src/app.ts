@@ -211,6 +211,8 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   }
 
   private renderProjects() {
+    const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+    listEl.innerHTML = '';
     for (const prjItem of this.assignedProjects) {
       new ProjectItem(this.element.querySelector('ul')!.id, prjItem);
     }
