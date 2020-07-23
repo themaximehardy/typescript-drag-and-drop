@@ -686,6 +686,8 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
 
 We created `moveProject` in `ProjectState` which we call in `ProjectList`.
 
+> Note: more on [Drag & Drop](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API).
+
 ```ts
 class ProjectState extends State<Project> {
   //...
