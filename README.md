@@ -636,3 +636,48 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
   //...
 }
 ```
+
+### 15. Adding a Droppable Area
+
+We use `DragEvent` with `dataTransfer` to pass the id of the current project.
+
+```ts
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements Draggable {
+  //...
+  @Autobind
+  dragStartHandler(event: DragEvent) {
+    event.dataTransfer!.setData('text/plain', this.project.id);
+    event.dataTransfer!.effectAllowed = 'move';
+  }
+
+  @Autobind
+  dragEndHandler(_: DragEvent) {
+    console.log('dragend');
+  }
+  //...
+}
+
+class ProjectList extends Component<HTMLDivElement, HTMLElement> implements DragTarget {
+  //...
+  @Autobind
+  dragOverHandler(event: DragEvent) {
+    if (event?.dataTransfer?.types[0] === 'text/plain') {
+      event.preventDefault();
+      const listEl = this.element.querySelector('ul');
+      listEl?.classList.add('droppable');
+    }
+  }
+
+  @Autobind
+  dropHandler(event: DragEvent) {
+    console.log(event.dataTransfer!.getData('text/plain')); // we get the id of the project we dragged
+  }
+
+  @Autobind
+  dragLeaveHandler(_: DragEvent) {
+    const listEl = this.element.querySelector('ul');
+    listEl?.classList.remove('droppable');
+  }
+  //...
+}
+```
