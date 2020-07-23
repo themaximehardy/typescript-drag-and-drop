@@ -403,3 +403,96 @@ class ProjectList {
   }
   //...
 ```
+
+### 10. Adding Inheritance & Generics
+
+We created a `Component` abstract class (we can't instantiate it, because the class is incomplete in the sense it contains abstract methods without body and output) where we use generics `<T extends HTMLElement, U extends HTMLElement>` because we could get ≠ types for the `hostElement` and the `element`. We added two abstract methods `configure` and `renderContent` which has to be defined in the concrete subclass.
+
+```ts
+abstract class Component<T extends HTMLElement, U extends HTMLElement> {
+  templateElement: HTMLTemplateElement;
+  hostElement: T;
+  element: U;
+
+  constructor(templateId: string, hostElementId: string, insertAtStart: boolean, newElementId?: string) {
+    this.templateElement = document.getElementById(templateId)! as HTMLTemplateElement;
+    this.hostElement = document.getElementById(hostElementId)! as T;
+
+    const importedNode = document.importNode(this.templateElement.content, true);
+    this.element = importedNode.firstElementChild as U;
+    if (newElementId) {
+      this.element.id = newElementId;
+    }
+
+    this.attach(insertAtStart);
+  }
+
+  private attach(insertAtBeginning: boolean) {
+    this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'beforeend', this.element);
+  }
+
+  abstract configure(): void;
+  abstract renderContent(): void;
+}
+```
+
+Then we can extends `ProjectList` with `Component`. Same for `ProjectInput`. We take advantage of code reusage (thanks to inheritance).
+
+```ts
+class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+  assignedProjects: Project[];
+
+  constructor(private type: 'active' | 'finished') {
+    super('project-list', 'app', false, `${type}-projects`);
+    this.assignedProjects = [];
+
+    this.configure();
+    this.renderContent();
+  }
+
+  configure() {
+    projectState.addListener((projects: Project[]) => {
+      //...
+      this.renderProjects();
+    });
+  }
+  //...
+```
+
+We can also improve our "state management" by creating a "general" `State` class. With a generic type pass to the `Listener`, `ProjectState` now extends `State` (with Listeners of type `Project`).
+
+```ts
+class State<T> {
+  protected listeners: Listener<T>[] = [];
+
+  addListener(listenerFn: Listener<T>) {
+    this.listeners.push(listenerFn);
+  }
+}
+
+class ProjectState extends State<Project> {
+  private projects: Project[] = [];
+  private static instance: ProjectState;
+
+  private constructor() {
+    super(); // we need to add super here
+  }
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  addProject(title: string, description: string, numOfPeople: number) {
+    const newProject = new Project(Math.random.toString(), title, description, numOfPeople, ProjectStatus.Active);
+    this.projects.push(newProject);
+    for (const listenerFn of this.listeners) {
+      // slice allow us to return a copy of the array and not the reference
+      listenerFn(this.projects.slice());
+    }
+  }
+}
+```
