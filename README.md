@@ -581,7 +581,7 @@ interface DragTarget {
 }
 ```
 
-We have to implement the `Draggable` interface to `ProjectItem`. And we have to implement the methods we have created in the interfaces.
+We have to implement the `Draggable` interface to `ProjectItem`. And we have to implement the methods we have created in the interface.
 
 ```ts
 class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements Draggable {
@@ -599,6 +599,39 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
   configure() {
     this.element.addEventListener('dragstart', this.dragStartHandler);
     this.element.addEventListener('dragend', this.dragEndHandler);
+  }
+  //...
+}
+```
+
+### 14. Drag Events & Reflecting the Current State in the UI
+
+We have to implement the `DragTarget` interface to `ProjectList`. And we have to implement the methods we have created in the interface.
+
+```ts
+class ProjectList extends Component<HTMLDivElement, HTMLElement> implements DragTarget {
+  //...
+  @Autobind
+  dragOverHandler(_: DragEvent) {
+    const listEl = this.element.querySelector('ul');
+    listEl?.classList.add('droppable');
+  }
+
+  @Autobind
+  dropHandler(_: DragEvent) {}
+
+  @Autobind
+  dragLeaveHandler(_: DragEvent) {
+    const listEl = this.element.querySelector('ul');
+    listEl?.classList.remove('droppable');
+  }
+
+  configure() {
+    this.element.addEventListener('dragover', this.dragOverHandler);
+    this.element.addEventListener('drop', this.dropHandler);
+    this.element.addEventListener('dragleave', this.dragLeaveHandler);
+
+    //...
   }
   //...
 }
