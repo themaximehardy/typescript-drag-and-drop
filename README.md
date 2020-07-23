@@ -561,3 +561,45 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
   }
 }
 ```
+
+### 13. Utilizing Interfaces to Implement Drag & Drop
+
+We created two new interfaces `Draggable` (which will be the `ProjectItem`) and `DragTarget` (which will be the `ProjectList`).
+
+> Note: we need to add `draggable="true"` to the html element which will be draggable – `<li draggable="true">`.
+
+```ts
+interface Draggable {
+  dragStartHandler(event: DragEvent): void;
+  dragEndHandler(event: DragEvent): void;
+}
+
+interface DragTarget {
+  dragOverHandler(event: DragEvent): void;
+  dragHandler(event: DragEvent): void;
+  dragLeaveHandler(event: DragEvent): void;
+}
+```
+
+We have to implement the `Draggable` interface to `ProjectItem`. And we have to implement the methods we have created in the interfaces.
+
+```ts
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements Draggable {
+  //...
+  @Autobind
+  dragStartHandler(event: DragEvent) {
+    console.log(event);
+  }
+
+  @Autobind
+  dragEndHandler(_: DragEvent) {
+    console.log('dragend');
+  }
+
+  configure() {
+    this.element.addEventListener('dragstart', this.dragStartHandler);
+    this.element.addEventListener('dragend', this.dragEndHandler);
+  }
+  //...
+}
+```
