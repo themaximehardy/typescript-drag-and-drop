@@ -292,7 +292,7 @@ class ProjectState {
 
   addProject(title: string, description: string, numOfPeople: number) {
     const newProject = {
-      id: Math.random.toString(), // Not a good practice but ok for our purpose here
+      id: Math.random().toString(), // Not a good practice but ok for our purpose here
       title,
       description,
       people: numOfPeople,
@@ -338,7 +338,7 @@ class ProjectList {
 
 ### 8. More Classes & Custom Types
 
-We have created a `Project` class to enforce the same project structure everywhere we want to use it. We added a `status` which is an `enum` (`ProjectStatus`). We've also created a new type `Listener`, which is a function which takes `Project` array in arg and return void. We now create a new project by `const newProject = new Project(Math.random.toString(), title, description, numOfPeople, ProjectStatus.Active);`.
+We have created a `Project` class to enforce the same project structure everywhere we want to use it. We added a `status` which is an `enum` (`ProjectStatus`). We've also created a new type `Listener`, which is a function which takes `Project` array in arg and return void. We now create a new project by `const newProject = new Project(Math.random().toString(), title, description, numOfPeople, ProjectStatus.Active);`.
 
 ```ts
 // PROJECT TYPE
@@ -367,7 +367,7 @@ class ProjectState {
 
   //...
   addProject(title: string, description: string, numOfPeople: number) {
-    const newProject = new Project(Math.random.toString(), title, description, numOfPeople, ProjectStatus.Active);
+    const newProject = new Project(Math.random().toString(), title, description, numOfPeople, ProjectStatus.Active);
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
       // slice allow us to return a copy of the array and not the reference
@@ -487,7 +487,7 @@ class ProjectState extends State<Project> {
   }
 
   addProject(title: string, description: string, numOfPeople: number) {
-    const newProject = new Project(Math.random.toString(), title, description, numOfPeople, ProjectStatus.Active);
+    const newProject = new Project(Math.random().toString(), title, description, numOfPeople, ProjectStatus.Active);
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
       // slice allow us to return a copy of the array and not the reference
@@ -677,6 +677,59 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
   dragLeaveHandler(_: DragEvent) {
     const listEl = this.element.querySelector('ul');
     listEl?.classList.remove('droppable');
+  }
+  //...
+}
+```
+
+### 16. Finishing Drag & Drop
+
+We created `moveProject` in `ProjectState` which we call in `ProjectList`.
+
+```ts
+class ProjectState extends State<Project> {
+  //...
+  moveProject(projectId: string, newStatus: ProjectStatus) {
+    const project = this.projects.find((prj) => prj.id === projectId);
+    if (project && project.status !== newStatus) {
+      // we check the status to not render if we drag in the same project list
+      project.status = newStatus;
+      this.updateListeners();
+    }
+  }
+
+  private updateListeners() {
+    for (const listenerFn of this.listeners) {
+      listenerFn(this.projects.slice());
+    }
+  }
+  //...
+}
+
+class ProjectList extends Component<HTMLDivElement, HTMLElement> implements DragTarget {
+  //...
+  @Autobind
+  dropHandler(event: DragEvent) {
+    const prjId = event.dataTransfer!.getData('text/plain');
+    projectState.moveProject(prjId, this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished);
+  }
+  //...
+}
+
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements Draggable {
+  //...
+  @Autobind
+  dragStartHandler(event: DragEvent) {
+    event.dataTransfer!.setData('text/plain', this.project.id);
+    event.dataTransfer!.effectAllowed = 'move';
+  }
+
+  @Autobind
+  dragEndHandler(_: DragEvent) {}
+
+  configure() {
+    this.element.addEventListener('dragstart', this.dragStartHandler);
+    this.element.addEventListener('dragend', this.dragEndHandler);
   }
   //...
 }
