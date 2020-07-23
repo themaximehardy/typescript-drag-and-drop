@@ -736,3 +736,8 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
   //...
 }
 ```
+
+### 17. Modules & Namespaces
+
+- [Using ES module (import/export)](https://github.com/themaximehardy/typescript-drag-and-drop/pull/2)
+- [Using TS namespace and bundling (import/export)](https://github.com/themaximehardy/typescript-drag-and-drop/pull/1)

@@ -4,6 +4,9 @@
 # VS Code
 .vscode
 
+# Built files directories
+dist
+
 # Dependency directories
 node_modules/
 
