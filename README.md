@@ -538,3 +538,26 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 }
 //...
 ```
+
+### 12. Using a Getter
+
+Using a `getter` is a good idea here. We want to display `1 person` or `X (multiple) perons` before "assigned".
+
+```ts
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  //...
+  get persons() {
+    if (this.project.people === 1) {
+      return '1 person';
+    } else {
+      return `${this.project.people} persons`;
+    }
+  }
+  //...
+  renderContent() {
+    //...
+    this.element.querySelector('h3')!.textContent = this.persons + ' assigned'; // we call it like a property (not like a method/function)
+    //...
+  }
+}
+```
