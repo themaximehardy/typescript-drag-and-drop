@@ -1,5 +1,7 @@
 # TypeScript: Drag And Drop Project
 
+![ts project](https://i.giphy.com/S5VR5yCdASSzy4wlQv.gif 'TS Drag And Drop Project')
+
 ### 1. DOM Element Selection & OOP Rendering
 
 The idea here, we created the `class` `ProjectInput` where we initialised `templateElement` and `hostElement` in the constructor. We knew their types (`HTMLTemplateElement` and `HTMLDivElement`) and we were sure they will be available on the page. We can use `!`. We got the content from `#project-input` by using `document.importNode` and we specified the `form` element which is the first child. Then, we attached the `form` in the `#app` element.
